@@ -55,8 +55,8 @@ async def passenger_history(message: Message) -> None:
 @router.message(F.text == "➕ Создать заказ")
 async def order_start(message: Message, state: FSMContext) -> None:
     user = await get_user(message.from_user.id)
-    if not user or user["role"] != "passenger":
-        await message.answer("Эта функция доступна только пассажирам.")
+    if not user:
+        await message.answer("Сначала запустите бота командой /start")
         return
 
     # Проверка долга
