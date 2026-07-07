@@ -7,8 +7,8 @@ from aiogram.fsm.context import FSMContext
 
 from database.db import get_user, update_driver_info, change_role
 from keyboards import driver_menu, passenger_menu, confirm_changerole_keyboard
-from states import EditProfileStates, DriverRegStates
-from config import ROLE_DRIVER, ROLE_PASSENGER, DRIVER_BONUS_BALANCE
+from states import EditProfileStates
+from config import ROLE_DRIVER, ROLE_PASSENGER
 from utils.middleware import MENU_BUTTONS
 
 logger = logging.getLogger(__name__)
@@ -110,9 +110,10 @@ async def changerole_confirm(callback: CallbackQuery, state: FSMContext, bot: Bo
     await change_role(callback.from_user.id, new_role)
 
     if new_role == ROLE_DRIVER:
+        user = await get_user(callback.from_user.id)
         await callback.message.edit_text(
-            f"✅ Вы теперь <b>водитель</b>!\n\n"
-            f"Заполните профиль через кнопку ✏️ Редактировать профиль",
+            "✅ Вы теперь <b>водитель</b>!\n\n"
+            "Заполните профиль через кнопку ✏️ Редактировать профиль",
             parse_mode="HTML",
         )
         await callback.message.answer("🚕 Меню водителя:", reply_markup=driver_menu())
