@@ -7,7 +7,7 @@ from aiogram.fsm.context import FSMContext
 
 from database.db import (
     get_user, create_order, get_passenger_orders, cancel_order,
-    get_all_drivers, get_order,
+    get_all_drivers,
 )
 from keyboards import (
     confirm_order_keyboard, passenger_menu, driver_order_keyboard,
@@ -55,8 +55,8 @@ async def passenger_history(message: Message) -> None:
 @router.message(F.text == "➕ Создать заказ")
 async def order_start(message: Message, state: FSMContext) -> None:
     user = await get_user(message.from_user.id)
-    if not user:
-        await message.answer("Сначала запустите бота командой /start")
+    if not user or user["role"] != "passenger":
+        await message.answer("Эта функция доступна только пассажирам.")
         return
 
     # Проверка долга
