@@ -4,16 +4,15 @@ import logging
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
-
 from database.db import (
     get_user, create_order, get_passenger_orders, cancel_order,
-    get_all_drivers,
+    get_all_drivers, get_order,
+
 )
 from keyboards import (
     confirm_order_keyboard, passenger_menu, driver_order_keyboard,
     cancel_active_order_keyboard,
 )
-from utils.middleware import MENU_BUTTONS
 from states import OrderStates
 from utils import format_order, safe_send, stars
 from config import COMMISSION_RATE
@@ -79,8 +78,6 @@ async def order_start(message: Message, state: FSMContext) -> None:
 # ─── Шаг 2: Адрес назначения ──────────────────────────────────────────────────
 @router.message(OrderStates.waiting_from)
 async def order_from(message: Message, state: FSMContext) -> None:
-    if message.text in MENU_BUTTONS:
-        return
     if not message.text or len(message.text.strip()) < 3:
         await message.answer("❗ Пожалуйста, введите корректный адрес.")
         return
@@ -95,8 +92,6 @@ async def order_from(message: Message, state: FSMContext) -> None:
 # ─── Шаг 3: Стоимость ─────────────────────────────────────────────────────────
 @router.message(OrderStates.waiting_to)
 async def order_to(message: Message, state: FSMContext) -> None:
-    if message.text in MENU_BUTTONS:
-        return
     if not message.text or len(message.text.strip()) < 3:
         await message.answer("❗ Пожалуйста, введите корректный адрес.")
         return
@@ -111,8 +106,6 @@ async def order_to(message: Message, state: FSMContext) -> None:
 # ─── Шаг 4: Подтверждение ─────────────────────────────────────────────────────
 @router.message(OrderStates.waiting_price)
 async def order_price(message: Message, state: FSMContext) -> None:
-    if message.text in MENU_BUTTONS:
-        return
     # Валидация суммы
     try:
         price = float(message.text.replace(",", ".").strip())
@@ -236,7 +229,7 @@ async def kaspi_info(message: Message) -> None:
     await message.answer(
         "💳 <b>Пополнение баланса через Kaspi</b>\n\n"
         "Переведите нужную сумму по номеру:\n"
-        "<b>87761537597</b> (QasymGo)\n\n"
+        "<b>4400 4303 3598 9056</b> (QasymGo)\n\n"s
         "После перевода отправьте скриншот чека администратору:\n"
         "@Daniyar21_06\n\n"
         "⏱ Баланс пополняется в течение 30 минут.",
